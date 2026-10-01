@@ -1,0 +1,658 @@
+html {
+  color-scheme: light only;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #fafafa !important;
+  color: #111 !important;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+h2 {
+  font-weight: 600;
+}
+
+/* ---------- Nav ---------- */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e2e2;
+  margin-bottom: 28px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-links a:hover {
+  border-bottom-color: #000;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.nav-username {
+  font-weight: 600;
+  color: #555;
+}
+
+/* ---------- Auth pages ---------- */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 28px;
+}
+
+.auth-subtitle {
+  font-size: 13px;
+  color: #666;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.auth-switch {
+  font-size: 13px;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.auth-switch a {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ---------- Forms ---------- */
+form {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.auth-card form {
+  border: none;
+  padding: 0;
+  margin-bottom: 0;
+  background: none;
+}
+
+form label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #444;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+
+form label:first-of-type {
+  margin-top: 0;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+  font-family: inherit;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  text-transform: none;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: auto;
+}
+
+.form-buttons {
+  margin-top: 18px;
+}
+
+/* ---------- Buttons ---------- */
+button {
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+button.secondary {
+  background: #fff;
+  color: #111;
+  border: 1px solid #ccc;
+}
+
+button.danger {
+  background: #fff;
+  color: #b00020;
+  border: 1px solid #e0b3ba;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---------- Page header ---------- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #111;
+  padding-bottom: 10px;
+}
+
+.page-header h1 {
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolbar input,
+.toolbar select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+}
+
+/* ---------- Suggestions dropdown ---------- */
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 10;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:hover {
+  background: #f5f5f5;
+}
+
+/* ---------- Game grid & cards ---------- */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.game-card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.game-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.game-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #eee;
+  overflow: hidden;
+}
+
+.game-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.game-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #999;
+  background: #eee;
+}
+
+.favorite-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #111;
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.game-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.game-title {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  font-size: 11px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  padding: 2px 6px;
+  color: #444;
+}
+
+.tag-status {
+  background: #111;
+  color: #fff;
+}
+
+.game-text-block {
+  margin-top: 2px;
+}
+
+.game-text-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #999;
+}
+
+.game-description {
+  font-size: 12px;
+  color: #666;
+  margin: 2px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.game-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #555;
+  margin-top: 2px;
+}
+
+.stars .star {
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.stars .star-readonly {
+  cursor: default;
+}
+
+.hours {
+  font-size: 12px;
+  color: #777;
+}
+
+.game-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.game-actions button {
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+/* ---------- Stat boxes (dashboard) ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.stat-box {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ---------- Profiles list ---------- */
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.profile-item:hover {
+  border-color: #111;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.you-badge {
+  font-size: 12px;
+  color: #777;
+  font-weight: 400;
+}
+
+/* ---------- Profile header (perfil público) ---------- */
+.profile-header {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.profile-cover {
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(135deg, #eee, #ddd);
+  overflow: hidden;
+}
+
+.profile-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-header-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 0 20px 20px;
+  margin-top: -36px;
+  flex-wrap: wrap;
+}
+
+.profile-avatar-large {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-header-info {
+  flex: 1;
+  padding-top: 8px;
+}
+
+.profile-header-info h1 {
+  margin-bottom: 2px;
+}
+
+.profile-location {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.profile-bio {
+  font-size: 13px;
+  color: #333;
+  margin: 4px 0 0;
+  max-width: 480px;
+}
+
+.avatar-preview {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+}
+
+.cover-preview {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  margin-top: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.notice {
+  background: #e9f7ee;
+  border: 1px solid #b7e4c7;
+  color: #0a7d2a;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+/* ---------- Misc ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th, td {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #fafafa;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.empty {
+  padding: 24px;
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  background: #fff;
+}
+
+.error {
+  color: #b00020;
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 8px;
+}
