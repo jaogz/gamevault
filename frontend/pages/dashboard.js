@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Nav from '../components/Nav';
 import { getCurrentUser } from '../lib/auth';
-import { BASE_URL } from '../lib/constants';
+import { apiGet, describeError } from '../lib/api';
 
 export default function Dashboard() {
   const router = useRouter();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkedAuth, setCheckedAuth] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -17,9 +18,9 @@ export default function Dashboard() {
       return;
     }
     setCheckedAuth(true);
-    fetch(`${BASE_URL}/games?userId=${user.id}`)
-      .then((res) => res.json())
-      .then((data) => setGames(data))
+    apiGet(`/games?userId=${user.id}`)
+      .then((data) => setGames(Array.isArray(data) ? data : []))
+      .catch((err) => setError(describeError(err)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -53,6 +54,7 @@ export default function Dashboard() {
     <div className="container">
       <Nav />
       <h1>Dashboard</h1>
+      {error && <div className="error">{error}</div>}
 
       {loading ? (
         <p>Carregando...</p>

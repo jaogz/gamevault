@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Nav from '../components/Nav';
 import { getCurrentUser } from '../lib/auth';
-import { BASE_URL } from '../lib/constants';
+import { apiGet, describeError } from '../lib/api';
 
 export default function Profiles() {
   const router = useRouter();
@@ -12,6 +12,7 @@ export default function Profiles() {
   const [currentUser, setCurrentUserState] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
   const [sort, setSort] = useState('name');
 
   useEffect(() => {
@@ -23,9 +24,9 @@ export default function Profiles() {
     setCurrentUserState(user);
     setCheckedAuth(true);
 
-    fetch(`${BASE_URL}/users`)
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
+    apiGet('/users')
+      .then((data) => setUsers(Array.isArray(data) ? data : []))
+      .catch((err) => setError(describeError(err)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -52,6 +53,8 @@ export default function Profiles() {
       <p style={{ fontSize: 14, marginBottom: 16 }}>
         Veja a coleção de jogos de outros usuários cadastrados no GameVault.
       </p>
+
+      {error && <div className="error">{error}</div>}
 
       <div className="toolbar">
         <input

@@ -75,10 +75,11 @@ export default function Library() {
   async function loadGames(userId) {
     try {
       const res = await fetch(`${API_URL}?userId=${userId}`);
+      if (!res.ok) throw new Error('erro do servidor');
       const data = await res.json();
-      setGames(data);
+      setGames(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError('Não foi possível conectar ao backend (verifique se ele está rodando na porta 3001).');
+      setError('Não consegui carregar seus jogos. O servidor pode estar acordando (espere cerca de 1 minuto e recarregue) ou o banco ainda não foi atualizado.');
     }
   }
 
@@ -434,6 +435,8 @@ export default function Library() {
           {error && <div className="error">{error}</div>}
         </form>
       )}
+
+      {error && !showForm && <div className="error">{error}</div>}
 
       <div className="toolbar">
         <input

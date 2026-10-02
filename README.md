@@ -144,8 +144,9 @@ Acesse `http://localhost:3000`, clique em **Criar perfil** e comece a cadastrar 
 
 **2. Backend (Render → New → Web Service)**
 - Root Directory: `backend`
-- Build Command: `npm install && npx prisma generate && npx prisma db push && npm run build`
+- Build Command: `npm install && npm run build`
 - Start Command: `node dist/main.js`
+- O banco (Neon) é ajustado automaticamente quando o backend inicia (colunas de gêneros e tabela de seguidores), então não precisa rodar migração no deploy. Abrir o endereço do backend no navegador mostra `schemaReady: true` quando está tudo certo.
 - Environment: `DATABASE_URL` com a connection string do Neon
 
 **3. Frontend (Render → New → Static Site)**

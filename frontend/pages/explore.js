@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Nav from '../components/Nav';
 import CatalogCard from '../components/CatalogCard';
-import { BASE_URL, GENRES } from '../lib/constants';
+import { GENRES } from '../lib/constants';
+import { apiGet, describeError } from '../lib/api';
 
 const SORTS = [
   { value: 'popular', label: 'Mais populares' },
@@ -33,13 +34,12 @@ export default function Explore() {
     const timer = setTimeout(() => {
       setLoading(true);
       const params = new URLSearchParams({ q, genre, sort });
-      fetch(`${BASE_URL}/games/catalog?${params.toString()}`)
-        .then((res) => res.json())
+      apiGet(`/games/catalog?${params.toString()}`)
         .then((data) => {
           setResult(data);
           setError('');
         })
-        .catch(() => setError('Não consegui conectar ao servidor.'))
+        .catch((err) => setError(describeError(err)))
         .finally(() => setLoading(false));
     }, 300);
     return () => clearTimeout(timer);

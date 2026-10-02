@@ -42,7 +42,10 @@ export default function PublicProfile() {
         if (!res.ok) throw new Error('not found');
         return res.json();
       }),
-      fetch(`${BASE_URL}/games?userId=${id}`).then((res) => res.json()),
+      fetch(`${BASE_URL}/games?userId=${id}`).then((res) => {
+        if (!res.ok) throw new Error('games');
+        return res.json();
+      }),
     ])
       .then(([userData, gamesData]) => {
         setProfileUser(userData);

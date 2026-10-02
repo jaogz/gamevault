@@ -5,7 +5,8 @@ import Avatar from '../components/Avatar';
 import CatalogCard from '../components/CatalogCard';
 import StarsReadOnly from '../components/StarsReadOnly';
 import { getCurrentUser } from '../lib/auth';
-import { BASE_URL, gameLink, timeAgo } from '../lib/constants';
+import { gameLink, timeAgo } from '../lib/constants';
+import { apiGet, describeError } from '../lib/api';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -17,14 +18,12 @@ export default function Home() {
     const current = getCurrentUser();
     setUser(current);
 
-    fetch(`${BASE_URL}/games/home`)
-      .then((res) => res.json())
+    apiGet('/games/home')
       .then(setData)
-      .catch(() => setError('Não consegui conectar ao servidor. Se ele acabou de ser aberto, espere cerca de 1 minuto e recarregue.'));
+      .catch((err) => setError(describeError(err)));
 
     if (current) {
-      fetch(`${BASE_URL}/games/feed?userId=${current.id}`)
-        .then((res) => res.json())
+      apiGet(`/games/feed?userId=${current.id}`)
         .then(setFeed)
         .catch(() => setFeed([]));
     }
