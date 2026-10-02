@@ -8,9 +8,8 @@ Projeto desenvolvido como **Atividade Final (MVP)** do componente **Programaçã
 
 | O quê | Link |
 |-------|------|
-| Aplicação online | [COLE AQUI O LINK DO SITE NO RENDER] |
-| API online | [COLE AQUI O LINK DO BACKEND NO RENDER] |
-| Vídeo de apresentação | [COLE AQUI O LINK DO YOUTUBE] |
+| Aplicação online |[ [COLE AQUI O LINK DO SITE NO RENDER]](https://gamevault-1-b5w4.onrender.com/) |
+| Vídeo de apresentação |[ [COLE AQUI O LINK DO YOUTUBE] ](https://youtu.be/CN9IEudrFmw)|
 
 > O backend gratuito "dorme" depois de alguns minutos sem uso e demora cerca de 1 minuto pra acordar na primeira requisição. O site (frontend) é estático e fica sempre no ar. O banco de dados é um Postgres gratuito (Neon), então os dados não se perdem quando o backend dorme.
 
@@ -157,4 +156,4 @@ Acesse `http://localhost:3000`, clique em **Criar perfil** e comece a cadastrar 
 
 ## Vídeo de apresentação
 
-[COLE AQUI O LINK DO YOUTUBE]
+https://youtu.be/CN9IEudrFmw
