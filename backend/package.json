@@ -6,7 +6,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "prisma:push": "prisma db push",
+    "prisma:migrate": "prisma migrate dev --name init",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {

@@ -65,50 +65,13 @@ export class UsersService {
     }));
   }
 
-  async findOne(id: number, viewerId?: number) {
+  async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: {
-        ...PUBLIC_FIELDS,
-        _count: { select: { games: true, followers: true, following: true } },
-      },
+      select: PUBLIC_FIELDS,
     });
     if (!user) throw new NotFoundException('Usuário não encontrado');
-
-    let isFollowing = false;
-    if (viewerId && viewerId !== id) {
-      const rel = await this.prisma.follow.findUnique({
-        where: { followerId_followingId: { followerId: viewerId, followingId: id } },
-      });
-      isFollowing = !!rel;
-    }
-
-    const { _count, ...rest } = user as any;
-    return {
-      ...rest,
-      gameCount: _count.games,
-      followersCount: _count.followers,
-      followingCount: _count.following,
-      isFollowing,
-    };
-  }
-
-  async follow(followingId: number, followerId: number) {
-    if (followingId === followerId) {
-      throw new BadRequestException('Você não pode seguir a si mesmo');
-    }
-    await this.findOne(followingId);
-    await this.prisma.follow.upsert({
-      where: { followerId_followingId: { followerId, followingId } },
-      update: {},
-      create: { followerId, followingId },
-    });
-    return this.findOne(followingId, followerId);
-  }
-
-  async unfollow(followingId: number, followerId: number) {
-    await this.prisma.follow.deleteMany({ where: { followerId, followingId } });
-    return this.findOne(followingId, followerId);
+    return user;
   }
 
   async updateProfile(id: number, dto: UpdateProfileDto) {

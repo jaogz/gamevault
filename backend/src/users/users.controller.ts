@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -24,18 +24,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Query('viewerId') viewerId?: string) {
-    return this.usersService.findOne(+id, viewerId ? +viewerId : undefined);
-  }
-
-  @Post(':id/follow')
-  follow(@Param('id') id: string, @Body('followerId') followerId: number) {
-    return this.usersService.follow(+id, Number(followerId));
-  }
-
-  @Delete(':id/follow')
-  unfollow(@Param('id') id: string, @Query('followerId') followerId: string) {
-    return this.usersService.unfollow(+id, Number(followerId));
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
   }
 
   @Patch(':id')

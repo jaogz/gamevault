@@ -17,18 +17,6 @@ model User {
   location  String?
   createdAt DateTime @default(now())
   games     Game[]
-  following Follow[] @relation("UserFollowing") // quem este usuário segue
-  followers Follow[] @relation("UserFollowers") // quem segue este usuário
-}
-
-model Follow {
-  followerId  Int
-  followingId Int
-  createdAt   DateTime @default(now())
-  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@id([followerId, followingId])
 }
 
 model Game {
@@ -36,9 +24,7 @@ model Game {
   name        String
   platform    String?
   status      String?
-  genre       String?   // legado: primeiro gênero (mantido por compatibilidade)
-  genres      String[]  @default([]) // todos os gêneros do jogo
-  fromCatalog Boolean   @default(false) // descrição veio do catálogo (Steam) e não é editável
+  genre       String?
   description String?   // sobre o jogo em si (o que ele é)
   review      String?   // opinião/consideração pessoal de quem cadastrou
   hoursPlayed Int?
