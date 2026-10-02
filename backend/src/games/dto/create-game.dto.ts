@@ -1,4 +1,4 @@
-import { IsBoolean, IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateGameDto {
   @IsNotEmpty({ message: 'Nome do jogo é obrigatório' })
@@ -19,6 +19,17 @@ export class CreateGameDto {
   @IsOptional()
   @IsString()
   genre?: string;
+
+  // Um jogo pode ter vários gêneros
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  genres?: string[];
+
+  // true quando a descrição veio do catálogo (Steam) ou de outra biblioteca
+  @IsOptional()
+  @IsBoolean()
+  fromCatalog?: boolean;
 
   // Sobre o jogo em si (sinopse/o que ele é)
   @IsOptional()

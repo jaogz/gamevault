@@ -4,8 +4,7 @@ import Link from 'next/link';
 import Nav from '../components/Nav';
 import GameCard from '../components/GameCard';
 import { getCurrentUser } from '../lib/auth';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { BASE_URL } from '../lib/constants';
 
 export default function PublicProfile() {
   const router = useRouter();
@@ -39,7 +38,7 @@ export default function PublicProfile() {
   function loadProfile() {
     setLoading(true);
     Promise.all([
-      fetch(`${BASE_URL}/users/${id}`).then((res) => {
+      fetch(`${BASE_URL}/users/${id}?viewerId=${me?.id || ''}`).then((res) => {
         if (!res.ok) throw new Error('not found');
         return res.json();
       }),
@@ -53,6 +52,29 @@ export default function PublicProfile() {
       .finally(() => setLoading(false));
   }
 
+  async function toggleFollow() {
+    if (!me || !profileUser) return;
+    try {
+      const res = await fetch(
+        profileUser.isFollowing
+          ? `${BASE_URL}/users/${profileUser.id}/follow?followerId=${me.id}`
+          : `${BASE_URL}/users/${profileUser.id}/follow`,
+        profileUser.isFollowing
+          ? { method: 'DELETE' }
+          : {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ followerId: me.id }),
+            }
+      );
+      if (!res.ok) throw new Error('erro');
+      const updated = await res.json();
+      setProfileUser((u) => ({ ...u, ...updated }));
+    } catch (err) {
+      setNotice('Não foi possível atualizar. Tente de novo.');
+    }
+  }
+
   async function handleAddToLibrary(game) {
     if (!me) return;
     try {
@@ -63,8 +85,9 @@ export default function PublicProfile() {
           userId: me.id,
           name: game.name,
           platform: game.platform || undefined,
-          genre: game.genre || undefined,
+          genres: game.genres?.length ? game.genres : undefined,
           description: game.description || undefined,
+          fromCatalog: game.fromCatalog || undefined,
           imageUrl: game.imageUrl || undefined,
           // status, review, rating, favorite, hoursPlayed ficam zerados:
           // são pessoais de quem está copiando, não de quem cadastrou.
@@ -118,13 +141,18 @@ export default function PublicProfile() {
                 {profileUser.location && <div className="profile-location">📍 {profileUser.location}</div>}
                 {profileUser.bio && <p className="profile-bio">{profileUser.bio}</p>}
                 <p style={{ fontSize: 13, color: '#777', margin: '4px 0 0' }}>
-                  {games.length} jogo(s) na coleção
+                  <strong>{games.length}</strong> jogo(s) · <strong>{profileUser.followersCount ?? 0}</strong> seguidores · <strong>{profileUser.followingCount ?? 0}</strong> seguindo
                 </p>
               </div>
               {isOwnProfile && (
                 <Link href="/account">
                   <button className="secondary">Editar perfil</button>
                 </Link>
+              )}
+              {!isOwnProfile && (
+                <button className={profileUser.isFollowing ? 'secondary' : ''} onClick={toggleFollow}>
+                  {profileUser.isFollowing ? 'Seguindo ✓' : 'Seguir'}
+                </button>
               )}
             </div>
           </div>

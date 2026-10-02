@@ -13,20 +13,32 @@ export default function Nav() {
 
   function handleLogout() {
     clearCurrentUser();
-    router.push('/login');
+    setUser(null);
+    router.push('/');
   }
 
   return (
     <div className="nav">
       <div className="nav-links">
-        <Link href="/">Meus jogos</Link>
-        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/" className="nav-brand">GameVault</Link>
+        <Link href="/explore">Explorar</Link>
+        {user && <Link href="/library">Minha biblioteca</Link>}
+        {user && <Link href="/dashboard">Dashboard</Link>}
         <Link href="/profiles">Perfis</Link>
         {user && <Link href={`/profile?id=${user.id}`}>Meu perfil</Link>}
       </div>
       <div className="nav-user">
-        {user && <span className="nav-username">{user.username}</span>}
-        <button className="secondary" onClick={handleLogout}>Sair</button>
+        {user ? (
+          <>
+            <span className="nav-username">{user.username}</span>
+            <button className="secondary" onClick={handleLogout}>Sair</button>
+          </>
+        ) : (
+          <>
+            <Link href="/login"><button className="secondary">Entrar</button></Link>
+            <Link href="/register"><button>Criar conta</button></Link>
+          </>
+        )}
       </div>
     </div>
   );

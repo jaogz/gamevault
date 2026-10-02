@@ -40,6 +40,13 @@ Projeto desenvolvido como **Atividade Final (MVP)** do componente **Programaçã
 - Busca por nome, plataforma ou gênero, e filtro por status e por favoritos
 - Exportação da lista em CSV
 - Dashboard com total de jogos, horas jogadas, nota média e jogos por status
+- **Tela inicial:** estatísticas da comunidade, jogos populares, mais bem avaliados, opiniões recentes e novos jogadores (e, logado, a atividade de quem você segue)
+- **Explorar:** catálogo de todos os jogos da comunidade, com busca por nome, filtro por gênero e ordenação (populares, melhor avaliados, recentes, A-Z)
+- **Página do jogo:** nota média da comunidade, distribuição das notas, opiniões de cada jogador e quem tem o jogo
+- **Vários gêneros por jogo** (ex.: Ação + Aventura + Mundo aberto), com filtro por gênero na biblioteca e gráfico de gêneros no dashboard
+- **Descrição do catálogo não editável:** quando o jogo vem da Steam (descrição em português), o texto é travado — a opinião pessoal é um campo separado
+- **Busca de usuários** por nome ou localização, com ordenação
+- **Seguir usuários** e feed de atividade na tela inicial
 - **Perfis públicos:** visitar a coleção, favoritos, notas e opiniões de outros usuários
 - **Adicionar à minha biblioteca:** copiar um jogo do perfil de outra pessoa direto pra sua própria coleção (a cópia vem só com os dados do jogo — nome, plataforma, gênero, descrição e capa; sua nota, opinião e status ficam em branco pra você preencher com a sua própria experiência)
 
@@ -47,7 +54,9 @@ Projeto desenvolvido como **Atividade Final (MVP)** do componente **Programaçã
 
 **User** — id, username (único), password (hash), avatarUrl, coverUrl, bio, location, createdAt. Relação 1:N com Game.
 
-**Game** — id, name, platform, status, genre, **description** (sobre o jogo), **review** (opinião pessoal), hoursPlayed, rating (1-5), favorite, imageUrl, completedAt, createdAt, userId (dono).
+**Follow** — followerId, followingId, createdAt (quem segue quem). Relação N:N entre usuários.
+
+**Game** — id, name, platform, status, **genres** (lista), genre (legado), **fromCatalog** (descrição travada), **description** (sobre o jogo), **review** (opinião pessoal), hoursPlayed, rating (1-5), favorite, imageUrl, completedAt, createdAt, userId (dono).
 
 ## Estrutura do repositório
 
@@ -75,7 +84,7 @@ DATABASE_URL="postgresql://usuario:senha@host/banco?sslmode=require"
 ```bash
 cd backend
 npm install
-npx prisma migrate dev --name init
+npx prisma db push
 npm run start:dev
 ```
 
@@ -108,6 +117,10 @@ Acesse `http://localhost:3000`, clique em **Criar perfil** e comece a cadastrar 
 | GET | /users | Listar perfis |
 | GET | /users/:id | Buscar um perfil |
 | PATCH | /users/:id | Editar perfil (foto, capa, bio, localização) |
+| POST | /users/:id/follow | Seguir (body: `followerId`) |
+| DELETE | /users/:id/follow?followerId=ID | Deixar de seguir |
+
+`GET /users/:id?viewerId=ID` também devolve seguidores, seguindo e se o `viewerId` já segue o perfil.
 
 ### Jogos
 
@@ -118,6 +131,10 @@ Acesse `http://localhost:3000`, clique em **Criar perfil** e comece a cadastrar 
 | POST | /games | Criar jogo (ou copiar da biblioteca de outra pessoa) |
 | PATCH | /games/:id | Editar jogo |
 | DELETE | /games/:id | Excluir jogo |
+| GET | /games/home | Dados da tela inicial (estatísticas, populares, mais bem avaliados, opiniões, novos usuários) |
+| GET | /games/feed?userId=ID | Atividade de quem o usuário segue |
+| GET | /games/catalog?q=&genre=&sort= | Catálogo da comunidade (`sort`: popular, rating, recent, name) |
+| GET | /games/catalog/detail?name=NOME | Página do jogo: nota média, distribuição, opiniões |
 | GET | /games/search-external?q=TEXTO | Buscar jogos na Steam (sugestões) |
 | GET | /games/external-details?appid=ID | Buscar gênero e descrição na Steam |
 
@@ -127,7 +144,7 @@ Acesse `http://localhost:3000`, clique em **Criar perfil** e comece a cadastrar 
 
 **2. Backend (Render → New → Web Service)**
 - Root Directory: `backend`
-- Build Command: `npm install && npx prisma generate && npx prisma migrate deploy && npm run build`
+- Build Command: `npm install && npx prisma generate && npx prisma db push && npm run build`
 - Start Command: `node dist/main.js`
 - Environment: `DATABASE_URL` com a connection string do Neon
 

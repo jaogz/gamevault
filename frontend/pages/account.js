@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Nav from '../components/Nav';
 import { getCurrentUser } from '../lib/auth';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { BASE_URL } from '../lib/constants';
 
 // Redimensiona a imagem no navegador e devolve como data URL (base64),
 // pra não precisar de servidor de upload/armazenamento de arquivos.

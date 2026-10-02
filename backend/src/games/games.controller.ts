@@ -18,6 +18,26 @@ export class GamesController {
   }
 
   // Precisam vir ANTES de @Get(':id'), senão seriam interpretadas como um id.
+  @Get('home')
+  home() {
+    return this.gamesService.home();
+  }
+
+  @Get('feed')
+  feed(@Query('userId') userId: string) {
+    return this.gamesService.feed(userId);
+  }
+
+  @Get('catalog')
+  catalog(@Query('q') q?: string, @Query('genre') genre?: string, @Query('sort') sort?: string) {
+    return this.gamesService.catalog(q, genre, sort);
+  }
+
+  @Get('catalog/detail')
+  catalogDetail(@Query('name') name: string) {
+    return this.gamesService.catalogDetail(name);
+  }
+
   @Get('search-external')
   searchExternal(@Query('q') q: string) {
     return this.gamesService.searchExternal(q);

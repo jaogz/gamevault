@@ -656,3 +656,126 @@ th {
   font-size: 13px;
   margin-top: 8px;
 }
+
+/* ================= Novas telas ================= */
+.game-title { display: block; }
+.nav-brand { font-weight: 800; font-size: 16px; }
+.nav-user a { display: inline-block; }
+
+/* Hero (tela inicial) */
+.hero {
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+  padding: 36px 28px;
+  margin-bottom: 20px;
+}
+.hero h1 { font-size: 28px; margin-bottom: 8px; }
+.hero p { color: #ccc; margin: 0 0 18px; max-width: 520px; font-size: 15px; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero .hero-actions button { background: #fff; color: #111; border-color: #fff; }
+.hero .hero-actions button.secondary { background: transparent; color: #fff; border-color: #777; }
+
+/* Seções */
+.home-section { margin-top: 32px; }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid #111;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+.section-header h2 { margin: 0; font-size: 16px; text-transform: uppercase; letter-spacing: 0.4px; }
+.see-all { font-size: 13px; font-weight: 600; color: #555; }
+.see-all:hover { color: #000; }
+
+/* Grid de jogos da comunidade */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+.catalog-card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.catalog-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+.catalog-cover { width: 100%; aspect-ratio: 16 / 9; background: #eee; overflow: hidden; }
+.catalog-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.catalog-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.catalog-meta { display: flex; justify-content: space-between; font-size: 11px; color: #666; }
+
+/* Chips (gêneros) */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.chip-on { background: #111; color: #fff; border-color: #111; }
+
+/* Descrição travada */
+textarea.locked-field { background: #f3f3f3 !important; color: #666; cursor: not-allowed; }
+.field-hint { font-size: 12px; color: #777; margin-top: 4px; }
+
+/* Atividade / opiniões */
+.activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item {
+  display: flex;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 12px;
+}
+.activity-cover {
+  width: 64px;
+  height: 36px;
+  flex-shrink: 0;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #999;
+}
+.activity-cover img { width: 100%; height: 100%; object-fit: cover; }
+.activity-body { flex: 1; min-width: 0; }
+.activity-review { font-size: 13px; color: #333; margin: 4px 0; white-space: pre-wrap; }
+
+/* Página do jogo */
+.game-hero { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.game-hero-cover {
+  width: 320px;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #eee;
+  border: 1px solid #e2e2e2;
+  flex-shrink: 0;
+}
+.game-hero-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.game-hero-info { flex: 1; min-width: 240px; }
+.game-hero-description { font-size: 14px; color: #333; margin: 0 0 14px; }
+.game-hero-actions { display: flex; gap: 8px; }
+
+/* Distribuição de notas */
+.dist { display: flex; flex-direction: column; gap: 6px; max-width: 420px; }
+.dist-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.dist-label { width: 30px; }
+.dist-bar-bg { flex: 1; background: #eee; height: 12px; border-radius: 3px; overflow: hidden; }
+.dist-bar { background: #111; height: 100%; }
+.dist-count { width: 24px; text-align: right; color: #666; }

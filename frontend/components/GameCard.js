@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import { gameLink } from '../lib/constants';
+
 function Stars({ value, onChange, readOnly }) {
   const stars = [1, 2, 3, 4, 5];
   return (
@@ -29,12 +32,14 @@ export default function GameCard({ game, readOnly, onEdit, onDelete, onToggleFav
       </div>
 
       <div className="game-body">
-        <div className="game-title" title={game.name}>{game.name}</div>
+        <Link href={gameLink(game.name)} className="game-title" title={game.name}>{game.name}</Link>
 
         <div className="game-tags">
           {game.platform && <span className="tag">{game.platform}</span>}
           {game.status && <span className="tag tag-status">{game.status}</span>}
-          {game.genre && <span className="tag">{game.genre}</span>}
+          {(game.genres || []).map((g) => (
+            <span key={g} className="tag">{g}</span>
+          ))}
         </div>
 
         {game.description && (

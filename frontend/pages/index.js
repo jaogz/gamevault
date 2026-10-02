@@ -1,452 +1,169 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Nav from '../components/Nav';
-import GameCard from '../components/GameCard';
+import Avatar from '../components/Avatar';
+import CatalogCard from '../components/CatalogCard';
+import StarsReadOnly from '../components/StarsReadOnly';
 import { getCurrentUser } from '../lib/auth';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const API_URL = `${BASE_URL}/games`;
-
-const emptyForm = {
-  id: null,
-  name: '',
-  platform: '',
-  status: '',
-  genre: '',
-  description: '',
-  review: '',
-  hoursPlayed: '',
-  rating: 0,
-  favorite: false,
-  imageUrl: '',
-  completedAt: '',
-};
-
-const PLATFORMS = ['PC', 'PS5', 'PS4', 'Xbox', 'Switch', 'Mobile'];
-const STATUSES = ['Jogando', 'Zerado', 'Quero jogar', 'Abandonado'];
-const GENRES = ['RPG', 'Ação', 'Aventura', 'Estratégia', 'Puzzle', 'Esporte', 'Outro'];
-
-function FormStars({ value, onChange }) {
-  const stars = [1, 2, 3, 4, 5];
-  return (
-    <span className="stars">
-      {stars.map((n) => (
-        <span
-          key={n}
-          onClick={() => onChange(n === value ? 0 : n)}
-          className="star"
-          style={{ color: n <= value ? '#000' : '#ccc', fontSize: 22 }}
-        >
-          {n <= value ? '★' : '☆'}
-        </span>
-      ))}
-    </span>
-  );
-}
+import { BASE_URL, gameLink, timeAgo } from '../lib/constants';
 
 export default function Home() {
-  const router = useRouter();
-  const [checkedAuth, setCheckedAuth] = useState(false);
   const [user, setUser] = useState(null);
-
-  const [games, setGames] = useState([]);
-  const [form, setForm] = useState(emptyForm);
-  const [editing, setEditing] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [data, setData] = useState(null);
+  const [feed, setFeed] = useState(null);
   const [error, setError] = useState('');
-
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [favoriteOnly, setFavoriteOnly] = useState(false);
-
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [fetchingDetails, setFetchingDetails] = useState(false);
 
   useEffect(() => {
     const current = getCurrentUser();
-    if (!current) {
-      router.push('/login');
-      return;
-    }
     setUser(current);
-    setCheckedAuth(true);
-    loadGames(current.id);
+
+    fetch(`${BASE_URL}/games/home`)
+      .then((res) => res.json())
+      .then(setData)
+      .catch(() => setError('Não consegui conectar ao servidor. Se ele acabou de ser aberto, espere cerca de 1 minuto e recarregue.'));
+
+    if (current) {
+      fetch(`${BASE_URL}/games/feed?userId=${current.id}`)
+        .then((res) => res.json())
+        .then(setFeed)
+        .catch(() => setFeed([]));
+    }
   }, []);
-
-  async function loadGames(userId) {
-    try {
-      const res = await fetch(`${API_URL}?userId=${userId}`);
-      const data = await res.json();
-      setGames(data);
-    } catch (err) {
-      setError('Não foi possível conectar ao backend (verifique se ele está rodando na porta 3001).');
-    }
-  }
-
-  function handleChange(e) {
-    const { name, type, checked, value } = e.target;
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
-
-    if (name === 'name') {
-      setShowSuggestions(true);
-    }
-  }
-
-  useEffect(() => {
-    if (!form.name || form.name.trim().length < 2 || !showSuggestions) {
-      setSuggestions([]);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/games/search-external?q=${encodeURIComponent(form.name)}`);
-        const data = await res.json();
-        setSuggestions(data);
-      } catch (err) {
-        setSuggestions([]);
-      }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [form.name, showSuggestions]);
-
-  async function pickSuggestion(item) {
-    setSuggestions([]);
-    setShowSuggestions(false);
-    setForm((f) => ({ ...f, name: item.name, imageUrl: item.image }));
-
-    if (!item.appid) return;
-
-    setFetchingDetails(true);
-    try {
-      const res = await fetch(`${BASE_URL}/games/external-details?appid=${item.appid}`);
-      const details = await res.json();
-      if (details) {
-        setForm((f) => ({
-          ...f,
-          genre: details.genre || f.genre,
-          description: details.description || f.description,
-          imageUrl: details.image || f.imageUrl,
-        }));
-      }
-    } catch (err) {
-      // segue com preenchimento manual
-    } finally {
-      setFetchingDetails(false);
-    }
-  }
-
-  function startEdit(game) {
-    setForm({
-      ...game,
-      hoursPlayed: game.hoursPlayed ?? '',
-      rating: game.rating ?? 0,
-      imageUrl: game.imageUrl || '',
-      description: game.description || '',
-      review: game.review || '',
-      completedAt: game.completedAt ? game.completedAt.slice(0, 10) : '',
-    });
-    setEditing(true);
-    setShowForm(true);
-    setShowSuggestions(false);
-  }
-
-  function cancelEdit() {
-    setForm(emptyForm);
-    setEditing(false);
-    setShowForm(false);
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-
-    const payload = {
-      name: form.name,
-      userId: user.id,
-      platform: form.platform || undefined,
-      status: form.status || undefined,
-      genre: form.genre || undefined,
-      description: form.description || undefined,
-      review: form.review || undefined,
-      hoursPlayed: form.hoursPlayed === '' ? undefined : Number(form.hoursPlayed),
-      rating: form.rating || undefined,
-      favorite: !!form.favorite,
-      imageUrl: form.imageUrl || undefined,
-      completedAt: form.completedAt ? new Date(form.completedAt).toISOString() : undefined,
-    };
-
-    try {
-      let res;
-      if (editing) {
-        res = await fetch(`${API_URL}/${form.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'Erro ao salvar jogo');
-      }
-
-      setForm(emptyForm);
-      setEditing(false);
-      setShowForm(false);
-      loadGames(user.id);
-    } catch (err) {
-      setError(typeof err.message === 'string' ? err.message : 'Erro ao salvar jogo');
-    }
-  }
-
-  async function handleDelete(id) {
-    if (!confirm('Excluir este jogo?')) return;
-    try {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-      loadGames(user.id);
-    } catch (err) {
-      setError('Erro ao excluir jogo');
-    }
-  }
-
-  async function toggleFavorite(game) {
-    try {
-      await fetch(`${API_URL}/${game.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ favorite: !game.favorite }),
-      });
-      loadGames(user.id);
-    } catch (err) {
-      setError('Erro ao atualizar favorito');
-    }
-  }
-
-  async function setRatingDirect(game, newRating) {
-    try {
-      await fetch(`${API_URL}/${game.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating: newRating }),
-      });
-      loadGames(user.id);
-    } catch (err) {
-      setError('Erro ao atualizar nota');
-    }
-  }
-
-  const visibleGames = useMemo(() => {
-    let list = [...games];
-
-    if (search.trim()) {
-      const term = search.trim().toLowerCase();
-      list = list.filter(
-        (g) =>
-          g.name?.toLowerCase().includes(term) ||
-          g.platform?.toLowerCase().includes(term) ||
-          g.genre?.toLowerCase().includes(term)
-      );
-    }
-
-    if (statusFilter) {
-      list = list.filter((g) => g.status === statusFilter);
-    }
-
-    if (favoriteOnly) {
-      list = list.filter((g) => g.favorite);
-    }
-
-    return list;
-  }, [games, search, statusFilter, favoriteOnly]);
-
-  function exportCSV() {
-    const header = ['Nome', 'Plataforma', 'Status', 'Gênero', 'Horas jogadas', 'Nota', 'Favorito', 'Concluído em'];
-    const rows = visibleGames.map((g) => [
-      g.name,
-      g.platform,
-      g.status,
-      g.genre,
-      g.hoursPlayed,
-      g.rating,
-      g.favorite ? 'Sim' : 'Não',
-      g.completedAt ? g.completedAt.slice(0, 10) : '',
-    ]);
-
-    const csvContent = [header, ...rows]
-      .map((row) => row.map((field) => `"${(field ?? '').toString().replace(/"/g, '""')}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'jogos.csv';
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  if (!checkedAuth) {
-    return null;
-  }
 
   return (
     <div className="container">
       <Nav />
 
-      <div className="page-header">
-        <h1>Meus jogos</h1>
-        <button onClick={() => { setShowForm(!showForm); if (showForm) cancelEdit(); }}>
-          {showForm ? 'Fechar' : '+ Adicionar jogo'}
-        </button>
-      </div>
-
-      {showForm && (
-        <form onSubmit={handleSubmit}>
-          <label>Nome do jogo</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              autoComplete="off"
-              required
-            />
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="suggestions">
-                {suggestions.map((item, i) => (
-                  <div key={i} onClick={() => pickSuggestion(item)} className="suggestion-item">
-                    {item.image && <img src={item.image} alt="" style={{ width: 40, height: 'auto' }} />}
-                    <span style={{ fontSize: 13 }}>{item.name}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          {fetchingDetails && <div style={{ fontSize: 12, marginTop: 4 }}>Buscando gênero e descrição...</div>}
-          {form.imageUrl && (
-            <div style={{ marginTop: 8 }}>
-              <img src={form.imageUrl} alt="capa selecionada" style={{ width: 140, border: '1px solid #000' }} />
+      <section className="hero">
+        {user ? (
+          <>
+            <h1>Olá, {user.username}!</h1>
+            <p>Veja o que a comunidade anda jogando e registre o que você jogou por último.</p>
+            <div className="hero-actions">
+              <Link href="/library"><button>Minha biblioteca</button></Link>
+              <Link href="/explore"><button className="secondary">Explorar jogos</button></Link>
             </div>
+          </>
+        ) : (
+          <>
+            <h1>Sua biblioteca de jogos, do seu jeito.</h1>
+            <p>Registre o que você joga, avalie, escreva sua opinião e descubra o que outras pessoas estão jogando.</p>
+            <div className="hero-actions">
+              <Link href="/register"><button>Criar conta grátis</button></Link>
+              <Link href="/explore"><button className="secondary">Explorar jogos</button></Link>
+            </div>
+          </>
+        )}
+      </section>
+
+      {error && <div className="error">{error}</div>}
+
+      {!data && !error && <p>Carregando...</p>}
+
+      {data && (
+        <>
+          <div className="stat-grid">
+            <div className="stat-box"><div className="stat-value">{data.stats.users}</div><div className="stat-label">Jogadores</div></div>
+            <div className="stat-box"><div className="stat-value">{data.stats.uniqueGames}</div><div className="stat-label">Jogos no catálogo</div></div>
+            <div className="stat-box"><div className="stat-value">{data.stats.games}</div><div className="stat-label">Jogos registrados</div></div>
+            <div className="stat-box"><div className="stat-value">{data.stats.reviews}</div><div className="stat-label">Opiniões escritas</div></div>
+          </div>
+
+          {user && (
+            <section className="home-section">
+              <div className="section-header"><h2>Atividade de quem você segue</h2></div>
+              {feed === null ? (
+                <p>Carregando...</p>
+              ) : feed.length === 0 ? (
+                <div className="empty">
+                  Nada por aqui ainda. Siga outros jogadores na página de <Link href="/profiles" style={{ textDecoration: 'underline' }}>Perfis</Link> pra ver o que eles andam jogando.
+                </div>
+              ) : (
+                <div className="activity-list">
+                  {feed.map((a) => (
+                    <ActivityItem key={a.id} a={a} />
+                  ))}
+                </div>
+              )}
+            </section>
           )}
 
-          <label>Plataforma</label>
-          <select name="platform" value={form.platform || ''} onChange={handleChange}>
-            <option value="">Selecione...</option>
-            {PLATFORMS.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
+          <section className="home-section">
+            <div className="section-header">
+              <h2>Populares na comunidade</h2>
+              <Link href="/explore?sort=popular" className="see-all">Ver todos →</Link>
+            </div>
+            {data.popular.length === 0 ? (
+              <div className="empty">Ainda não há jogos cadastrados.</div>
+            ) : (
+              <div className="catalog-grid">
+                {data.popular.map((g) => <CatalogCard key={g.key} item={g} />)}
+              </div>
+            )}
+          </section>
 
-          <label>Status</label>
-          <select name="status" value={form.status || ''} onChange={handleChange}>
-            <option value="">Selecione...</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+          {data.topRated.length > 0 && (
+            <section className="home-section">
+              <div className="section-header">
+                <h2>Mais bem avaliados</h2>
+                <Link href="/explore?sort=rating" className="see-all">Ver todos →</Link>
+              </div>
+              <div className="catalog-grid">
+                {data.topRated.map((g) => <CatalogCard key={g.key} item={g} />)}
+              </div>
+            </section>
+          )}
 
-          <label>Gênero</label>
-          <select name="genre" value={form.genre || ''} onChange={handleChange}>
-            <option value="">Selecione...</option>
-            {GENRES.map((g) => (
-              <option key={g} value={g}>{g}</option>
-            ))}
-          </select>
+          {data.recentReviews.length > 0 && (
+            <section className="home-section">
+              <div className="section-header"><h2>Opiniões recentes</h2></div>
+              <div className="activity-list">
+                {data.recentReviews.map((a) => <ActivityItem key={a.id} a={a} showReview />)}
+              </div>
+            </section>
+          )}
 
-          <label>Descrição do jogo (sobre o que ele é)</label>
-          <textarea
-            name="description"
-            value={form.description || ''}
-            onChange={handleChange}
-            rows={3}
-            placeholder="Preenchido automaticamente ao escolher uma sugestão, ou escreva na mão"
-          />
-
-          <label>Sua opinião (nota, considerações pessoais)</label>
-          <textarea
-            name="review"
-            value={form.review || ''}
-            onChange={handleChange}
-            rows={3}
-            placeholder="O que você achou do jogo, recomendaria, pontos fortes/fracos..."
-          />
-
-          <label>Horas jogadas</label>
-          <input type="number" min="0" name="hoursPlayed" value={form.hoursPlayed} onChange={handleChange} />
-
-          <label>Data de conclusão (opcional)</label>
-          <input type="date" name="completedAt" value={form.completedAt || ''} onChange={handleChange} />
-
-          <label style={{ marginTop: 10 }}>Sua nota</label>
-          <div style={{ marginTop: 2 }}>
-            <FormStars value={form.rating} onChange={(v) => setForm({ ...form, rating: v })} />
-          </div>
-
-          <label className="checkbox-label" style={{ marginTop: 12 }}>
-            <input type="checkbox" name="favorite" checked={!!form.favorite} onChange={handleChange} />
-            Favorito
-          </label>
-
-          <div className="form-buttons">
-            <button type="submit">{editing ? 'Salvar alterações' : 'Adicionar jogo'}</button>
-            <button type="button" className="secondary" onClick={cancelEdit} style={{ marginLeft: 8 }}>
-              Cancelar
-            </button>
-          </div>
-
-          {error && <div className="error">{error}</div>}
-        </form>
+          {data.newUsers.length > 0 && (
+            <section className="home-section">
+              <div className="section-header">
+                <h2>Novos jogadores</h2>
+                <Link href="/profiles" className="see-all">Ver perfis →</Link>
+              </div>
+              <div className="profile-list">
+                {data.newUsers.map((u) => (
+                  <Link key={u.id} href={`/profile?id=${u.id}`} className="profile-item">
+                    <Avatar user={u} />
+                    <span>
+                      <strong>{u.username}</strong>
+                      <div style={{ fontSize: 12, color: '#555' }}>{u.gameCount} jogo(s) na coleção</div>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
+    </div>
+  );
+}
 
-      <div className="toolbar">
-        <input
-          placeholder="Buscar por nome, plataforma ou gênero..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ flex: 1, minWidth: 200 }}
-        />
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="">Todos os status</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-        <label className="checkbox-label" style={{ fontSize: 14 }}>
-          <input type="checkbox" checked={favoriteOnly} onChange={(e) => setFavoriteOnly(e.target.checked)} />
-          Só favoritos
-        </label>
-        <button type="button" className="secondary" onClick={exportCSV}>Exportar CSV</button>
-      </div>
-
-      <p style={{ fontSize: 14 }}>
-        Mostrando <strong>{visibleGames.length}</strong> de <strong>{games.length}</strong> jogos
-      </p>
-
-      {visibleGames.length === 0 ? (
-        <div className="empty">Nenhum jogo encontrado. Clica em "+ Adicionar jogo" pra começar.</div>
-      ) : (
-        <div className="game-grid">
-          {visibleGames.map((g) => (
-            <GameCard
-              key={g.id}
-              game={g}
-              onEdit={startEdit}
-              onDelete={handleDelete}
-              onToggleFavorite={toggleFavorite}
-              onRate={setRatingDirect}
-            />
-          ))}
+function ActivityItem({ a, showReview }) {
+  return (
+    <div className="activity-item">
+      <Link href={gameLink(a.name)} className="activity-cover">
+        {a.imageUrl ? <img src={a.imageUrl} alt="" /> : <span>{a.name.charAt(0)}</span>}
+      </Link>
+      <div className="activity-body">
+        <div style={{ fontSize: 13 }}>
+          <Link href={`/profile?id=${a.user.id}`} style={{ fontWeight: 700 }}>{a.user.username}</Link>
+          {' '}adicionou <Link href={gameLink(a.name)} style={{ fontWeight: 700 }}>{a.name}</Link>
+          {a.status && <span className="you-badge"> · {a.status}</span>}
         </div>
-      )}
+        {a.rating > 0 && <StarsReadOnly value={a.rating} />}
+        {(showReview || a.review) && a.review && <p className="activity-review">{a.review}</p>}
+        <div className="you-badge">{timeAgo(a.createdAt)}</div>
+      </div>
     </div>
   );
 }

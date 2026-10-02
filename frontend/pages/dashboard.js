@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Nav from '../components/Nav';
 import { getCurrentUser } from '../lib/auth';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { BASE_URL } from '../lib/constants';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -38,6 +37,15 @@ export default function Dashboard() {
   const avgRating = ratedGames.length
     ? (ratedGames.reduce((sum, g) => sum + g.rating, 0) / ratedGames.length).toFixed(1)
     : '-';
+
+  const byGenre = games.reduce((acc, g) => {
+    (g.genres || []).forEach((name) => {
+      acc[name] = (acc[name] || 0) + 1;
+    });
+    return acc;
+  }, {});
+  const genreEntries = Object.entries(byGenre).sort((a, b) => b[1] - a[1]);
+  const maxGenre = Math.max(1, ...Object.values(byGenre));
 
   const maxCount = Math.max(1, ...Object.values(byStatus));
 
@@ -87,6 +95,33 @@ export default function Dashboard() {
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ background: '#000', height: 14, width: `${(count / maxCount) * 150}px` }} />
+                        <span>{count}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          <h2 style={{ fontSize: 16, marginTop: 28 }}>Gêneros mais jogados</h2>
+          {genreEntries.length === 0 ? (
+            <p style={{ fontSize: 14 }}>Nenhum gênero registrado ainda.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Gênero</th>
+                  <th>Jogos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {genreEntries.map(([name, count]) => (
+                  <tr key={name}>
+                    <td>{name}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ background: '#000', height: 14, width: `${(count / maxGenre) * 150}px` }} />
                         <span>{count}</span>
                       </div>
                     </td>
